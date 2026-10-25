@@ -22,7 +22,13 @@ import net.minecraft.world.World;
 public class CetroItem extends Item {
     private static final String[] PODERES = {
         "Dia", "Noite", "Clima limpo", "Chuva", "Tempestade", "Teletransporte", "Transmutar blocos",
-        "Escolher bioma", "Aplicar bioma", "Parar o tempo", "Voltar no tempo"
+        "Escolher bioma", "Aplicar bioma", "Parar o tempo", "Voltar no tempo",
+        "Aniquilar mobs", "Curar mobs", "Converter monstros", "Invocar aliados",
+        "Escolher estrutura", "Criar estrutura", "Raio divino", "Meteoro"
+    };
+
+    private static final String[] ESTRUTURAS = {
+        "Casa", "Torre", "Pirâmide", "Plataforma", "Cubo de blocos"
     };
 
     private static final String[] BIOMAS = {
@@ -53,6 +59,10 @@ public class CetroItem extends Item {
         return stack.getOrCreateNbt().getInt("bioma");
     }
 
+    private int getEstrutura(ItemStack stack) {
+        return stack.getOrCreateNbt().getInt("estrutura");
+    }
+
     @Override
     public boolean hasGlint(ItemStack stack) {
         return true;
@@ -67,7 +77,9 @@ public class CetroItem extends Item {
             int modo = (getModo(stack) + 1) % PODERES.length;
             stack.getOrCreateNbt().putInt("modo", modo);
             if (!world.isClient) {
-                String extra = (modo == 8) ? " (" + BIOMAS_NOMES[getBioma(stack)] + ")" : "";
+                String extra = "";
+                if (modo == 8) extra = " (" + BIOMAS_NOMES[getBioma(stack)] + ")";
+                if (modo == 16) extra = " (" + ESTRUTURAS[getEstrutura(stack)] + ")";
                 player.sendMessage(Text.literal("Poder: " + PODERES[modo] + extra), true);
             }
             return TypedActionResult.success(stack);
@@ -108,9 +120,22 @@ public class CetroItem extends Item {
                 String erro = Tempo.voltarNoTempo(sw, sp);
                 msg = (erro != null) ? erro : "Você voltou 5 segundos no tempo!";
             }
+            case 11 -> msg = Poderes.aniquilar(sw, sp);
+            case 12 -> msg = Poderes.curar(sw, sp);
+            case 13 -> msg = Poderes.converter(sw, sp);
+            case 14 -> msg = Poderes.invocarAliados(sw, sp);
+            case 15 -> {
+                int e = (getEstrutura(stack) + 1) % ESTRUTURAS.length;
+                stack.getOrCreateNbt().putInt("estrutura", e);
+                msg = "Estrutura escolhida: " + ESTRUTURAS[e];
+            }
+            case 16 -> msg = Poderes.criarEstrutura(sw, sp, getEstrutura(stack));
+            case 17 -> msg = Poderes.raio(sw, sp);
+            case 18 -> msg = Poderes.meteoro(sw, sp);
         }
 
-        player.getItemCooldownManager().set(this, modo == 7 ? 5 : 20);
+        int espera = (modo == 7 || modo == 15) ? 5 : (modo == 18 ? 60 : 20);
+        player.getItemCooldownManager().set(this, espera);
         player.sendMessage(Text.literal(msg), true);
         return TypedActionResult.success(stack);
     }
