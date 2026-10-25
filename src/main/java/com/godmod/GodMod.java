@@ -1,6 +1,8 @@
 package com.godmod;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
@@ -18,5 +20,11 @@ public class GodMod implements ModInitializer {
     public void onInitialize() {
         Registry.register(Registries.ITEM, new Identifier(MOD_ID, "cetro"), CETRO);
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(CETRO));
+
+        // Controle do tempo: roda a cada tick de cada mundo
+        ServerTickEvents.START_WORLD_TICK.register(Tempo::tick);
+
+        // Ao fechar o mundo, devolve tudo ao normal
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> Tempo.limpar());
     }
 }
