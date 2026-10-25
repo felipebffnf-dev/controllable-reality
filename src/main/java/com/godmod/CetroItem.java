@@ -20,7 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class CetroItem extends Item {
-    private static final String[] PODERES = {
+    public static final String[] PODERES = {
         "Dia", "Noite", "Clima limpo", "Chuva", "Tempestade", "Teletransporte", "Transmutar blocos",
         "Escolher bioma", "Aplicar bioma", "Parar o tempo", "Voltar no tempo",
         "Aniquilar mobs", "Curar mobs", "Converter monstros", "Invocar aliados",
@@ -51,16 +51,23 @@ public class CetroItem extends Item {
         super(settings);
     }
 
-    private int getModo(ItemStack stack) {
+    public static int getModo(ItemStack stack) {
         return stack.getOrCreateNbt().getInt("modo");
     }
 
-    private int getBioma(ItemStack stack) {
+    public static int getBioma(ItemStack stack) {
         return stack.getOrCreateNbt().getInt("bioma");
     }
 
-    private int getEstrutura(ItemStack stack) {
+    public static int getEstrutura(ItemStack stack) {
         return stack.getOrCreateNbt().getInt("estrutura");
+    }
+
+    // Texto extra mostrado ao trocar de poder (bioma/estrutura selecionados)
+    public static String extra(ItemStack stack, int modo) {
+        if (modo == 8) return " (" + BIOMAS_NOMES[getBioma(stack)] + ")";
+        if (modo == 16) return " (" + ESTRUTURAS[getEstrutura(stack)] + ")";
+        return "";
     }
 
     @Override
@@ -77,10 +84,7 @@ public class CetroItem extends Item {
             int modo = (getModo(stack) + 1) % PODERES.length;
             stack.getOrCreateNbt().putInt("modo", modo);
             if (!world.isClient) {
-                String extra = "";
-                if (modo == 8) extra = " (" + BIOMAS_NOMES[getBioma(stack)] + ")";
-                if (modo == 16) extra = " (" + ESTRUTURAS[getEstrutura(stack)] + ")";
-                player.sendMessage(Text.literal("Poder: " + PODERES[modo] + extra), true);
+                player.sendMessage(Text.literal("Poder: " + PODERES[modo] + extra(stack, modo)), true);
             }
             return TypedActionResult.success(stack);
         }

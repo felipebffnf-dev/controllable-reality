@@ -6,7 +6,8 @@
   "description": "Poderes de um deus: controle o tempo e altere a realidade.",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.godmod.GodMod"]
+    "main": ["com.godmod.GodMod"],
+    "client": ["com.godmod.GodModClient"]
   },
   "depends": {
     "fabricloader": ">=0.15.0",
