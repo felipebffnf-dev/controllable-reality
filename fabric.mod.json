@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "godmod",
+  "version": "${version}",
+  "name": "God Mod",
+  "description": "Poderes de um deus: controle o tempo e altere a realidade.",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.godmod.GodMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}
